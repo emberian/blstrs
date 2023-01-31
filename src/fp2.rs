@@ -246,6 +246,27 @@ impl Fp2 {
     pub fn is_quad_res(&self) -> bool {
         self.sqrt().is_some().into()
     }
+
+    pub fn to_bytes_le(&self) -> [u8; 96] {
+        let mut out = [0u8; 96];
+        let l1 = Fp(self.0.fp[0]).to_bytes_le();
+        let l2 = Fp(self.0.fp[1]).to_bytes_le();
+        out[..48].copy_from_slice(&l1[..]);
+        out[48..].copy_from_slice(&l2[..]);
+        out
+    }
+
+    pub fn from_bytes_le(buff: [u8; 96]) -> CtOption<Self> {
+        let (l1, l2): (&[u8; 48], &[u8; 48]) = unsafe {
+            let p1 = std::slice::from_raw_parts(buff.as_ptr(), 48).as_ptr() as *const [u8; 48];
+            let p2 =
+                std::slice::from_raw_parts(buff.as_ptr().add(48), 48).as_ptr() as *const [u8; 48];
+            (&*p1, &*p2)
+        };
+        let c0 = Fp::from_bytes_le(l1);
+        let c1 = Fp::from_bytes_le(l2);
+        c0.and_then(|c0| c1.map(|c1| Fp2(blst_fp2 { fp: [c0.0, c1.0] })))
+    }
 }
 
 impl Field for Fp2 {
@@ -331,6 +352,20 @@ mod tests {
     use rand_core::SeedableRng;
     use rand_xorshift::XorShiftRng;
 
+    #[test]
+    fn test_fp2_serialization() {
+        let mut rng = XorShiftRng::from_seed([
+            0x59, 0x62, 0xbe, 0x5d, 0x76, 0x3d, 0x31, 0x8d, 0x17, 0xdb, 0x37, 0x32, 0x54, 0x06,
+            0xbc, 0xe5,
+        ]);
+
+        for _ in 0..100 {
+            let a = Fp2::random(&mut rng);
+            let buff =  a.to_bytes_le();
+            let b : Fp2 = Option::from(Fp2::from_bytes_le(buff)).expect("should be able to deserialize");
+            assert_eq!(a,b, "failed serialization/deserialization");
+        }
+    }
     #[test]
     fn test_fp2_ordering() {
         let mut a = Fp2::new(Fp::ZERO, Fp::ZERO);
