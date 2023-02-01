@@ -298,6 +298,14 @@ impl From<u64> for Fp {
     }
 }
 
+impl From<u128> for Fp {
+    fn from(val: u128) -> Fp {
+        let mut repr = [0u8; 48];
+        repr[..16].copy_from_slice(&val.to_le_bytes());
+        Self::from_bytes_le(&repr).unwrap()
+    }
+}
+
 impl Ord for Fp {
     #[allow(clippy::comparison_chain)]
     fn cmp(&self, other: &Fp) -> cmp::Ordering {
