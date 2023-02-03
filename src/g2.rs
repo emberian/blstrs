@@ -385,7 +385,7 @@ impl G2Affine {
         unsafe { Choice::from(blst_p2_affine_on_curve(&self.0) as u8) }
     }
 
-    pub fn from_raw_unchecked(x: Fp2, y: Fp2, _infinity: bool) -> Self {
+    pub const fn from_raw_unchecked(x: Fp2, y: Fp2, _infinity: bool) -> Self {
         // FIXME: what about infinity?
         let raw = blst_p2_affine { x: x.0, y: y.0 };
 
@@ -549,7 +549,7 @@ impl G2Projective {
         G2Projective(out)
     }
 
-    pub fn from_raw_unchecked(x: Fp2, y: Fp2, z: Fp2) -> Self {
+    pub const fn from_raw_unchecked(x: Fp2, y: Fp2, z: Fp2) -> Self {
         let raw = blst_p2 {
             x: x.0,
             y: y.0,

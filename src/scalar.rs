@@ -603,6 +603,13 @@ impl Scalar {
         CtOption::new(Scalar(out), is_some)
     }
 
+    /// Constructs an element of `Scalar` from a little-endian array of limbs without checking
+    /// that it is canonical and without converting it to Montgomery form (i.e. without
+    /// multiplying by `R`).
+    pub const fn from_raw_unchecked(l: [u64; 4]) -> Self {
+        Scalar(blst_fr { l })
+    }
+
     #[allow(clippy::match_like_matches_macro)]
     pub fn is_quad_res(&self) -> Choice {
         match self.legendre() {

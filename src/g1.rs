@@ -364,7 +364,7 @@ impl G1Affine {
         unsafe { Choice::from(blst_p1_affine_on_curve(&self.0) as u8) }
     }
 
-    pub fn from_raw_unchecked(x: Fp, y: Fp, _infinity: bool) -> Self {
+    pub const fn from_raw_unchecked(x: Fp, y: Fp, _infinity: bool) -> Self {
         // FIXME: what about infinity?
         let raw = blst_p1_affine { x: x.0, y: y.0 };
 
@@ -582,7 +582,7 @@ impl G1Projective {
         G1Projective(out)
     }
 
-    pub fn from_raw_unchecked(x: Fp, y: Fp, z: Fp) -> Self {
+    pub const fn from_raw_unchecked(x: Fp, y: Fp, z: Fp) -> Self {
         let raw = blst_p1 {
             x: x.0,
             y: y.0,
