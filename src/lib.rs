@@ -66,6 +66,22 @@ impl Engine for Bls12 {
     }
 }
 
+// NOTE vmx 2023-02-08: This will no longer be needed to be public in case the arkworks
+// implementation is moved within this crate.
+pub fn miller_loop_lines(out: &mut blst::blst_fp12, q: &G2Prepared, p: &G1Affine) {
+    unsafe {
+        blst::blst_miller_loop_lines(out, q.lines.as_ptr(), &p.0);
+    }
+}
+
+// NOTE vmx 2023-02-08: This will no longer be needed to be public in case the arkworks
+// implementation is moved within this crate.
+pub fn final_exponentiation(result: &fp12::Fp12) -> fp12::Fp12 {
+    let mut out = blst::blst_fp12::default();
+    unsafe { blst::blst_final_exp(&mut out, &result.0) };
+    out.into()
+}
+
 impl MultiMillerLoop for Bls12 {
     type G2Prepared = G2Prepared;
     type Result = MillerLoopResult;
