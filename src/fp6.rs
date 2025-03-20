@@ -357,6 +357,8 @@ impl Field for Fp6 {
     }
 }
 
+const COEFF_SIZE: usize = 96;
+
 impl Fp6 {
     /// Constructs an element of `Fp6`.
     pub const fn new(c0: Fp2, c1: Fp2, c2: Fp2) -> Fp6 {
@@ -401,6 +403,33 @@ impl Fp6 {
         self.0.fp2[0] = c0.0;
         self.0.fp2[1] = c1.0;
         self.0.fp2[2] = c2.0;
+    }
+
+    pub fn to_bytes_le(&self) -> [u8; 288] {
+        let mut out = [0u8; COEFF_SIZE * 3];
+        let l1 = Fp2(self.0.fp2[0]).to_bytes_le();
+        let l2 = Fp2(self.0.fp2[1]).to_bytes_le();
+        let l3 = Fp2(self.0.fp2[2]).to_bytes_le();
+        out[..COEFF_SIZE].copy_from_slice(&l1[..]);
+        out[COEFF_SIZE..COEFF_SIZE * 2].copy_from_slice(&l2[..]);
+        out[COEFF_SIZE * 2..COEFF_SIZE * 3].copy_from_slice(&l3[..]);
+        out
+    }
+
+    pub fn from_bytes_le(buff: [u8; 288]) -> CtOption<Self> {
+        let (l1, l2, l3): (&[u8; COEFF_SIZE], &[u8; COEFF_SIZE], &[u8; COEFF_SIZE]) = unsafe {
+            let p1 = std::slice::from_raw_parts(buff.as_ptr(), COEFF_SIZE).as_ptr()
+                as *const [u8; COEFF_SIZE];
+            let p2 = std::slice::from_raw_parts(buff.as_ptr().add(COEFF_SIZE), COEFF_SIZE).as_ptr()
+                as *const [u8; COEFF_SIZE];
+            let p3 = std::slice::from_raw_parts(buff.as_ptr().add(COEFF_SIZE * 2), COEFF_SIZE)
+                .as_ptr() as *const [u8; COEFF_SIZE];
+            (&*p1, &*p2, &*p3)
+        };
+        let c0 = Fp2::from_bytes_le(*l1);
+        let c1 = Fp2::from_bytes_le(*l2);
+        let c2 = Fp2::from_bytes_le(*l3);
+        c0.and_then(|e0| c1.and_then(|e1| c2.map(|e2| Self::new(e0, e1, e2))))
     }
 }
 

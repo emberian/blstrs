@@ -24,6 +24,12 @@ use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
 #[repr(transparent)]
 pub struct Scalar(pub(crate) blst_fr);
 
+impl Scalar {
+    pub const fn new(raw: blst_fr) -> Self {
+        Scalar(raw)
+    }
+}
+
 // GENERATOR = 7 (multiplicative generator of r-1 order, that is also quadratic nonresidue)
 const GENERATOR: Scalar = Scalar(blst_fr {
     l: [

@@ -252,6 +252,8 @@ impl Field for Fp12 {
     }
 }
 
+const COEFF_SIZE: usize = 288;
+
 impl Fp12 {
     /// Constructs an element of `Fp12`.
     pub const fn new(c0: Fp6, c1: Fp6) -> Fp12 {
@@ -303,6 +305,27 @@ impl Fp12 {
 
     pub fn conjugate(&mut self) {
         unsafe { blst_fp12_conjugate(&mut self.0) };
+    }
+
+    pub fn to_bytes_le(&self) -> [u8; COEFF_SIZE] {
+        let mut out = [0u8; COEFF_SIZE];
+        let l1 = Fp6(self.0.fp6[0]).to_bytes_le();
+        let l2 = Fp6(self.0.fp6[1]).to_bytes_le();
+        out[..144].copy_from_slice(&l1[..]);
+        out[144..].copy_from_slice(&l2[..]);
+        out
+    }
+
+    pub fn from_bytes_le(buff: [u8; 2*COEFF_SIZE]) -> CtOption<Self> {
+        let (l1, l2): (&[u8; 288], &[u8; 288]) = unsafe {
+            let p1 = std::slice::from_raw_parts(buff.as_ptr(), 288).as_ptr() as *const [u8; 288];
+            let p2 =
+                std::slice::from_raw_parts(buff.as_ptr().add(288), 288).as_ptr() as *const [u8; 288];
+            (&*p1, &*p2)
+        };
+        let c0 = Fp6::from_bytes_le(*l1);
+        let c1 = Fp6::from_bytes_le(*l2);
+        c0.and_then(|c0| c1.map(|c1| Fp12(blst_fp12 { fp6: [c0.0, c1.0] })))
     }
 }
 
