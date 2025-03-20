@@ -15,7 +15,7 @@ use crate::fp2::Fp2;
 
 // Little-endian non-Montgomery form.
 #[allow(dead_code)]
-const MODULUS: [u64; 6] = [
+pub const MODULUS: [u64; 6] = [
     0xb9fe_ffff_ffff_aaab,
     0x1eab_fffe_b153_ffff,
     0x6730_d2a0_f6b0_f624,
@@ -36,7 +36,7 @@ const ZERO: Fp = Fp(blst_fp {
 });
 
 /// R = 2^384 mod p
-const R: Fp = Fp(blst_fp {
+pub const R: Fp = Fp(blst_fp {
     l: [
         0x7609_0000_0002_fffd,
         0xebf4_000b_c40c_0002,
@@ -300,6 +300,14 @@ impl From<u64> for Fp {
 
 impl From<u128> for Fp {
     fn from(val: u128) -> Fp {
+        let mut repr = [0u8; 48];
+        repr[..16].copy_from_slice(&val.to_le_bytes());
+        Self::from_bytes_le(&repr).unwrap()
+    }
+}
+
+impl From<i128> for Fp {
+    fn from(val: i128) -> Fp {
         let mut repr = [0u8; 48];
         repr[..16].copy_from_slice(&val.to_le_bytes());
         Self::from_bytes_le(&repr).unwrap()
@@ -611,7 +619,7 @@ impl Fp {
 
     /// Constructs an element of `Fp` from a little-endian array of limbs without checking that it
     /// is canonical and without converting it to Montgomery form (i.e. without multiplying by `R`).
-    pub fn from_raw_unchecked(l: [u64; 6]) -> Fp {
+    pub const fn from_raw_unchecked(l: [u64; 6]) -> Fp {
         Fp(blst_fp { l })
     }
 

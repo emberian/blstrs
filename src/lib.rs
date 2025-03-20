@@ -12,7 +12,11 @@ compile_error!("blstrs is only supported on little endian architectures");
 #[macro_use]
 mod macros;
 
+#[cfg(feature = "__private_bench")]
+pub mod fp;
+#[cfg(not(feature = "__private_bench"))]
 mod fp;
+
 mod fp12;
 mod fp2;
 mod fp6;
