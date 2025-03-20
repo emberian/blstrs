@@ -12,11 +12,7 @@ compile_error!("blstrs is only supported on little endian architectures");
 #[macro_use]
 mod macros;
 
-#[cfg(feature = "__private_bench")]
 pub mod fp;
-#[cfg(not(feature = "__private_bench"))]
-mod fp;
-
 mod fp12;
 mod fp2;
 mod fp6;
@@ -24,10 +20,9 @@ mod g1;
 mod g2;
 mod gt;
 mod pairing;
-mod scalar;
+pub mod scalar;
 mod traits;
 
-use blst::{blst_fp, blst_fp2, blst_p1, blst_p2};
 pub use g1::{G1Affine, G1Compressed, G1Projective, G1Uncompressed};
 pub use g2::{G2Affine, G2Compressed, G2Prepared, G2Projective, G2Uncompressed};
 pub use gt::Gt;

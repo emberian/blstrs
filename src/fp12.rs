@@ -252,7 +252,7 @@ impl Field for Fp12 {
     }
 }
 
-const COEFF_SIZE: usize = 288;
+const COEFF_SIZE: usize = 576;
 
 impl Fp12 {
     /// Constructs an element of `Fp12`.
@@ -311,12 +311,12 @@ impl Fp12 {
         let mut out = [0u8; COEFF_SIZE];
         let l1 = Fp6(self.0.fp6[0]).to_bytes_le();
         let l2 = Fp6(self.0.fp6[1]).to_bytes_le();
-        out[..144].copy_from_slice(&l1[..]);
-        out[144..].copy_from_slice(&l2[..]);
+        out[..288].copy_from_slice(&l1[..]);
+        out[288..].copy_from_slice(&l2[..]);
         out
     }
 
-    pub fn from_bytes_le(buff: [u8; 2*COEFF_SIZE]) -> CtOption<Self> {
+    pub fn from_bytes_le(buff: [u8; COEFF_SIZE]) -> CtOption<Self> {
         let (l1, l2): (&[u8; 288], &[u8; 288]) = unsafe {
             let p1 = std::slice::from_raw_parts(buff.as_ptr(), 288).as_ptr() as *const [u8; 288];
             let p2 =

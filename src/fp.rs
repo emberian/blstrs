@@ -314,6 +314,24 @@ impl From<i128> for Fp {
     }
 }
 
+macro_rules! impl_from {
+    ($t:ty) => {
+        impl From<$t> for Fp {
+            fn from(value: $t) -> Self {
+                Fp::from(value as u64)
+            }
+        }
+    };
+}
+
+impl_from!(u8);
+impl_from!(u16);
+impl_from!(u32);
+impl_from!(i8);
+impl_from!(i16);
+impl_from!(i32);
+impl_from!(i64);
+
 impl Ord for Fp {
     #[allow(clippy::comparison_chain)]
     fn cmp(&self, other: &Fp) -> cmp::Ordering {

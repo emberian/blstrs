@@ -31,7 +31,7 @@ impl Scalar {
 }
 
 // GENERATOR = 7 (multiplicative generator of r-1 order, that is also quadratic nonresidue)
-const GENERATOR: Scalar = Scalar(blst_fr {
+pub const GENERATOR: Scalar = Scalar(blst_fr {
     l: [
         0x0000_000e_ffff_fff1,
         0x17e3_63d3_0018_9c0f,
@@ -42,7 +42,7 @@ const GENERATOR: Scalar = Scalar(blst_fr {
 
 // Little-endian non-Montgomery form not reduced mod p.
 #[allow(dead_code)]
-const MODULUS: [u64; 4] = [
+pub const MODULUS: [u64; 4] = [
     0xffff_ffff_0000_0001,
     0x53bd_a402_fffe_5bfe,
     0x3339_d808_09a1_d805,
@@ -85,7 +85,7 @@ const ZERO: Scalar = Scalar(blst_fr { l: [0, 0, 0, 0] });
 ///
 /// sage> mod(2^256, 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001)
 /// sage> 0x1824b159acc5056f998c4fefecbc4ff55884b7fa0003480200000001fffffffe
-const R: Scalar = Scalar(blst_fr {
+pub const R: Scalar = Scalar(blst_fr {
     l: [
         0x0000_0001_ffff_fffe,
         0x5884_b7fa_0003_4802,
