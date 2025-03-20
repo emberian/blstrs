@@ -38,7 +38,7 @@ mod tests;
 
 // export for benchmarking only
 #[cfg(feature = "__private_bench")]
-pub use crate::{fp::Fp, fp12::Fp12, fp2::Fp2};
+pub use crate::{fp::Fp, fp12::Fp12, fp2::Fp2, fp6::Fp6};
 
 use ff::Field;
 use group::prime::PrimeCurveAffine;
